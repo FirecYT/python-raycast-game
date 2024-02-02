@@ -8,7 +8,7 @@ from tkinter import *
 class Game(ABC):
     @abstractmethod
     def __init__(self):
-        self.map = Map()
+        self.map = Map(25, 25)
         self.player = Player(12, 12, 0, self.map)
         self.raycast = Raycast(self.map)
 

@@ -1,12 +1,17 @@
 from math import pi, cos, sin
 from engine.Game import Game
+from engine.Player import Player
+from engine.Raycast import Raycast
+from engine.Maze import Maze
 from PIL import Image, ImageDraw
-
-import config
 
 class PillowGame(Game):
     def __init__(self, data = None):
         super().__init__()
+
+        self.map = Maze(25, 25).toMap()
+        self.player = Player(1, 1, 0, self.map)
+        self.raycast = Raycast(self.map)
 
         if data:
             self.player.x = data['player_x']
@@ -27,12 +32,6 @@ class PillowGame(Game):
         self.image_load = self.texture.load()
 
         self.draw = ImageDraw.Draw(self.image)
-    
-    def interpalation(self, x1, fx1, x3, fx3, x2):
-        try:
-            return x1 + (x2 - fx1) * (x3 - x1) / (fx3 - fx1)
-        except ZeroDivisionError:
-            return 0
 
     def render(self):
         rays = self.raycast.raycast(self.player.x + 0.5, self.player.y + 0.5, self.player.angle, self.screen_width)
@@ -90,6 +89,6 @@ if __name__ == "__main__":
     game = PillowGame({
         "player_x": 12,
         "player_y": 1,
-        "player_angle": -pi/2*3,
+        "player_angle": -pi,
     })
     game.run()
