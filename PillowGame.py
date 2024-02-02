@@ -5,11 +5,13 @@ from engine.Raycast import Raycast
 from engine.Maze import Maze
 from PIL import Image, ImageDraw
 
+MAP_SCALE = 32
+
 class PillowGame(Game):
     def __init__(self, data = None):
         super().__init__()
 
-        self.map = Maze(25, 25).toMap()
+        self.map = Maze(4, 4).toMap()
         self.player = Player(1, 1, 0, self.map)
         self.raycast = Raycast(self.map)
 
@@ -24,17 +26,20 @@ class PillowGame(Game):
         self.texture = Image.open('walltext.png')
 
         self.image = Image.new(
-            'RGBA',
+            'RGB',
             (self.screen_width, self.screen_height),
-            (0, 0, 0, 255)
+            (0, 0, 0)
         )
 
         self.image_load = self.texture.load()
 
         self.draw = ImageDraw.Draw(self.image)
+    
+    def player_angle(self):
+        return self.player.angle * pi / 2
 
     def render(self):
-        rays = self.raycast.raycast(self.player.x + 0.5, self.player.y + 0.5, self.player.angle, self.screen_width)
+        rays = self.raycast.raycast(self.player.x + 0.5, self.player.y + 0.5, self.player_angle(), self.screen_width)
 
         for ray_i in range(len(rays)):
             ray = rays[ray_i]
@@ -54,6 +59,17 @@ class PillowGame(Game):
 
                 wall_start = (self.screen_height - height) // 2
 
+                if wall_start > 0:
+                    self.draw.rectangle(
+                        (
+                            ray_i,
+                            0,
+                            ray_i + 1,
+                            wall_start,
+                        ),
+                        fill=(0,0,0)
+                    )
+
                 self.image.paste(
                     text_part,
                     (
@@ -65,7 +81,7 @@ class PillowGame(Game):
                 )
 
                 for screen_y in range(wall_start + height, self.screen_height):
-                    floor_distance = self.screen_height * 2 / (screen_y * 2 - self.screen_height) / cos(self.player.angle - ray.angle)
+                    floor_distance = self.screen_height * 2 / (screen_y * 2 - self.screen_height) / cos(self.player_angle() - ray.angle)
 
                     floor_position = (
                         self.player.x + 0.5 + abs(cos(ray.angle) * floor_distance),
@@ -80,6 +96,29 @@ class PillowGame(Game):
                         self.image_load[int(floor_x * 64), int(floor_y * 64)][:3]
                     )
 
+                for y in range(self.map.height):
+                    for x in range(self.map.width):
+                        self.draw.rectangle(
+                            (
+                                x * MAP_SCALE,
+                                y * MAP_SCALE,
+                                x * MAP_SCALE + MAP_SCALE,
+                                y * MAP_SCALE + MAP_SCALE,
+                            ),
+                            fill = (255, 255, 255) if self.map.check_collision(x, y) else (64, 64, 64),
+                            outline = (0, 0, 0)
+                        )
+
+                self.draw.rectangle(
+                    (
+                        self.player.x * MAP_SCALE + MAP_SCALE / 4,
+                        self.player.y * MAP_SCALE + MAP_SCALE / 4,
+                        self.player.x * MAP_SCALE + MAP_SCALE / 2,
+                        self.player.y * MAP_SCALE + MAP_SCALE / 2,
+                    ),
+                    (255, 0, 0)
+                )
+
     def run(self):
         self.render()
         self.image.show()
@@ -89,6 +128,6 @@ if __name__ == "__main__":
     game = PillowGame({
         "player_x": 12,
         "player_y": 1,
-        "player_angle": -pi,
+        "player_angle": 0,
     })
     game.run()

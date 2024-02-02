@@ -1,0 +1,7 @@
+from math import pi
+
+FOV: float = pi / 3
+MAX_DEPTH: int = 25
+
+VK_GROUP_TOKEN: str = ""
+VK_GROUP_ID: str = ""
