@@ -62,6 +62,11 @@ class Raycast:
 
                 if not self.map.check_collision(int(fixed_x), int(fixed_y)):
                     break
+            
+            if vd == 0:
+                vd = config.MAX_DEPTH
+            if hd == 0:
+                hd = config.MAX_DEPTH
 
             distance = min(vd, hd)
             vertical = vd < hd

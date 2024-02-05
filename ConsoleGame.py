@@ -1,9 +1,10 @@
 from math import sin, cos, pi
 from os import get_terminal_size
+from engine.Game import Game
 
 import config
 
-class ConsoleGame:
+class ConsoleGame(Game):
     def __init__(self):
         super().__init__()
         
@@ -20,7 +21,7 @@ class ConsoleGame:
         for ray in rays:
             reverse_distance: float = 1 - ray.distance / config.MAX_DEPTH
 
-            height = int(self.screen_height / max(ray.distance, 1e-6))
+            height = int(self.screen_height / max(ray.distance, 1))
 
             color_index = int(reverse_distance * len(self.colors))
 
@@ -42,11 +43,12 @@ class ConsoleGame:
             for x in range(self.screen_width):
                 screen[x + y * self.screen_width] = screen_lines[x][y]
 
-        for y in range(self.map.height):
-            for x in range(self.map.width):
-                screen[x + y * self.screen_width] = '.' if self.map.check_collision(x, y) else '#'
+        if self.screen_width > self.map.width and self.screen_height > self.map.height:
+            for y in range(self.map.height):
+                for x in range(self.map.width):
+                    screen[x + y * self.screen_width] = '.' if self.map.check_collision(x, y) else '#'
 
-        screen[int(self.player.x + self.player.y * self.screen_width)] = 'p'
+            screen[int(self.player.x + self.player.y * self.screen_width)] = 'p'
 
         print('\033[0;0H' + ''.join(screen), end='')
 
