@@ -8,81 +8,81 @@ from engine.Raycast import Raycast
 import config
 
 class ConsoleGame(Game):
-    def __init__(self):
-        super().__init__()
+	def __init__(self):
+		super().__init__()
 
-        self.map = Maze(config.MAP_WIDTH // 2, config.MAP_HEIGHT // 2).toMap()
-        self.player = Player(1, 1, 0, self.map)
-        self.raycast = Raycast(self.map)
-        
-        size = get_terminal_size()
-        self.screen_width = size.columns
-        self.screen_height = size.lines
+		self.map = Maze(config.MAP_WIDTH // 2, config.MAP_HEIGHT // 2).toMap()
+		self.player = Player(1, 1, 0, self.map)
+		self.raycast = Raycast(self.map)
 
-        self.colors = '░▒▓█'
+		size = get_terminal_size()
+		self.screen_width = size.columns
+		self.screen_height = size.lines
 
-    def render(self):
-        rays = self.raycast.raycast(self.player.x + 0.5, self.player.y + 0.5, self.player.angle, self.screen_width)
-        screen_lines = []
+		self.colors = '░▒▓█'
 
-        for ray in rays:
-            reverse_distance: float = 1 - ray.distance / config.MAX_DEPTH
+	def render(self):
+		rays = self.raycast.raycast(self.player.x + 0.5, self.player.y + 0.5, self.player.angle, self.screen_width)
+		screen_lines = []
 
-            height = int(self.screen_height / max(ray.distance, 1))
+		for ray in rays:
+			reverse_distance: float = 1 - ray.distance / config.MAX_DEPTH
 
-            color_index = int(reverse_distance * len(self.colors))
+			height = int(self.screen_height / max(ray.distance, 1))
 
-            if color_index == len(self.colors): color_index -= 1
-            color = self.colors[color_index] # if ray.vertical else ' '
+			color_index = int(reverse_distance * len(self.colors))
 
-            # sky
-            line = ' ' * int((self.screen_height - height) // 2 + 1) 
-            # walls
-            line += color * height
-            # floor
-            line += ' ' * int((self.screen_height - height) // 2)
+			if color_index == len(self.colors): color_index -= 1
+			color = self.colors[color_index] # if ray.vertical else ' '
 
-            screen_lines.append(line)
+			# sky
+			line = ' ' * int((self.screen_height - height) // 2 + 1)
+			# walls
+			line += color * height
+			# floor
+			line += ' ' * int((self.screen_height - height) // 2)
 
-        screen = [' ' for x in range(self.screen_height * self.screen_width)]
+			screen_lines.append(line)
 
-        for y in range(self.screen_height):
-            for x in range(self.screen_width):
-                screen[x + y * self.screen_width] = screen_lines[x][y]
+		screen = [' ' for x in range(self.screen_height * self.screen_width)]
 
-        if self.screen_width > self.map.width and self.screen_height > self.map.height:
-            for y in range(self.map.height):
-                for x in range(self.map.width):
-                    screen[x + y * self.screen_width] = '.' if self.map.check_collision(x, y) else '#'
+		for y in range(self.screen_height):
+			for x in range(self.screen_width):
+				screen[x + y * self.screen_width] = screen_lines[x][y]
 
-            screen[int(self.player.x + self.player.y * self.screen_width)] = 'p'
+		if self.screen_width > self.map.width and self.screen_height > self.map.height:
+			for y in range(self.map.height):
+				for x in range(self.map.width):
+					screen[x + y * self.screen_width] = '.' if self.map.check_collision(x, y) else '#'
 
-        print('\033[0;0H' + ''.join(screen), end='')
+			screen[int(self.player.x + self.player.y * self.screen_width)] = 'p'
 
-    def run(self):
-        while True:
-            self.render()
+		print('\033[0;0H' + ''.join(screen), end='')
 
-            command = input("Enter command (w/a/s/d): ")
-            if command == "w":
-                dx = cos(self.player.angle)
-                dy = sin(self.player.angle)
-                self.player.move(dx, dy)
-            elif command == "s":
-                dx = -cos(self.player.angle)
-                dy = -sin(self.player.angle)
-                self.player.move(dx, dy)
-            elif command == "a":
-                self.player.rotate(-pi/2)
-            elif command == "d":
-                self.player.rotate(pi/2)
-            elif command == "i":
-                item = input("Enter item to add to inventory: ")
-                self.player.add_to_inventory(item)
-            elif command == "q":
-                exit()
+	def run(self):
+		while True:
+			self.render()
+
+			command = input("Enter command (w/a/s/d): ")
+			if command == "w":
+				dx = cos(self.player.angle)
+				dy = sin(self.player.angle)
+				self.player.move(dx, dy)
+			elif command == "s":
+				dx = -cos(self.player.angle)
+				dy = -sin(self.player.angle)
+				self.player.move(dx, dy)
+			elif command == "a":
+				self.player.rotate(-pi/2)
+			elif command == "d":
+				self.player.rotate(pi/2)
+			elif command == "i":
+				item = input("Enter item to add to inventory: ")
+				self.player.add_to_inventory(item)
+			elif command == "q":
+				exit()
 
 if __name__ == "__main__":
-    # Запуск игры
-    game = ConsoleGame()
-    game.run()
+	# Запуск игры
+	game = ConsoleGame()
+	game.run()
