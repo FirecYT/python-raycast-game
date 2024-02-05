@@ -1,9 +1,11 @@
 from math import pi, cos, sin
 from engine.Game import Game
+from engine.Maze import Maze
 from engine.Player import Player
 from engine.Raycast import Raycast
-from engine.Maze import Maze
 from PIL import Image, ImageDraw
+
+import config
 
 MAP_SCALE = 32
 
@@ -11,7 +13,7 @@ class PillowGame(Game):
     def __init__(self, data = None):
         super().__init__()
 
-        self.map = Maze(4, 4).toMap()
+        self.map = Maze(config.MAP_WIDTH // 2, config.MAP_HEIGHT // 2).toMap()
         self.player = Player(1, 1, 0, self.map)
         self.raycast = Raycast(self.map)
 

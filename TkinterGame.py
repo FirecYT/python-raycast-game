@@ -1,5 +1,8 @@
 from math import sin, cos, pi
 from engine.Game import Game
+from engine.Maze import Maze
+from engine.Player import Player
+from engine.Raycast import Raycast
 
 import config
 
@@ -8,6 +11,10 @@ from tkinter import *
 class TkinterGame(Game):
     def __init__(self):
         super().__init__()
+
+        self.map = Maze(config.MAP_WIDTH // 2, config.MAP_HEIGHT // 2).toMap()
+        self.player = Player(1, 1, 0, self.map)
+        self.raycast = Raycast(self.map)
 
         self.screen_width = 800
         self.screen_height = 600

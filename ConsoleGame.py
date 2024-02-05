@@ -1,12 +1,19 @@
 from math import sin, cos, pi
 from os import get_terminal_size
 from engine.Game import Game
+from engine.Maze import Maze
+from engine.Player import Player
+from engine.Raycast import Raycast
 
 import config
 
 class ConsoleGame(Game):
     def __init__(self):
         super().__init__()
+
+        self.map = Maze(config.MAP_WIDTH // 2, config.MAP_HEIGHT // 2).toMap()
+        self.player = Player(1, 1, 0, self.map)
+        self.raycast = Raycast(self.map)
         
         size = get_terminal_size()
         self.screen_width = size.columns
@@ -29,11 +36,11 @@ class ConsoleGame(Game):
             color = self.colors[color_index] # if ray.vertical else ' '
 
             # sky
-            line = ' ' * int((self.screen_height - height) / 2 + 1) 
+            line = ' ' * int((self.screen_height - height) // 2 + 1) 
             # walls
             line += color * height
             # floor
-            line += ' ' * int((self.screen_height - height) / 2)
+            line += ' ' * int((self.screen_height - height) // 2)
 
             screen_lines.append(line)
 
