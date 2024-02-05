@@ -10,18 +10,27 @@ from PillowGame import PillowGame
 from config import *
 
 class VkGame(PillowGame):
+    def get_dx(self):
+        if self.player.angle % 4 == 0: # Right
+            return 1
+        elif self.player.angle % 4 == 2: # Left
+            return -1
+        
+        return 0
+
+    def get_dy(self):
+        if self.player.angle % 4 == 1: # Bottom
+            return 1
+        elif self.player.angle % 4 == 3: # Top
+            return -1
+        
+        return 0
+
     def execute_command(self, command):
         if command == "w":
-            if self.player.angle % 2 == 0:
-                dx, dy = 1, 0
-            else:
-                dx, dy = 0, 1
-            self.player.move(dx, dy)
+            self.player.move(self.get_dx(), self.get_dy())
         elif command == "s":
-            if self.player.angle % 2 == 0:
-                dx, dy = -1, 0
-            else:
-                dx, dy = 0, -1
+            self.player.move(-self.get_dx(), -self.get_dy())
         elif command == "a":
             self.player.rotate(-1)
         elif command == "d":
@@ -59,12 +68,12 @@ class VkManager():
                 if not player_id in self.players:
                     self.players[player_id] = VkGame()
 
-                game = self.players[player_id]
-
                 if event.obj.text == "q":
                     exit()
                 elif event.obj.text == "restart":
                     self.players[player_id] = VkGame()
+
+                game = self.players[player_id]
 
                 game.execute_command(event.obj.text)
                 game.render()
